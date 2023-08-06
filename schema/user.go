@@ -12,7 +12,6 @@ type ValidateLoginForm struct {
 // ValidateSignUpForm validates json data while creating a new brand
 type ValidateSignUpForm struct {
 	Name            string `json:"name" validate:"required"`
-	Username        string `json:"username"`
 	Email           string `json:"email" validate:"required,email"`
 	Password        string `json:"password" validate:"required,eqfield=ConfirmPassword,gte=8"`
 	ConfirmPassword string `json:"confirm_password" validate:"required"`
@@ -118,16 +117,14 @@ type ValidateEditAccessProfile struct {
 }
 
 type ValidateEditUser struct {
-	UserID   *primitive.ObjectID `json:"user_id"`
-	Image    string              `json:"image"`
-	Name     string              `json:"name"`
-	Username string              `json:"username"`
+	UserID *primitive.ObjectID `json:"user_id"`
+	Image  string              `json:"image"`
+	Name   string              `json:"name"`
 }
 
 // CreatedBy contains info about user who is creating something
 type UserModel struct {
-	UserID   primitive.ObjectID `json:"user_id"`
-	Username string             `json:"username"`
-	Name     string             `json:"name"`
-	Email    string             `json:"email"`
+	UserID primitive.ObjectID `json:"user_id"`
+	Name   string             `json:"name"`
+	Email  string             `json:"email"`
 }

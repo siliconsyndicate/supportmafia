@@ -218,10 +218,9 @@ func (t *TicketImpl) ResolveTicket(v *schema.ValidateResolveTicket) (*model.Tick
 	var ticket *model.Ticket
 
 	resolvedBy := &model.UserModel{
-		UserID:   v.ResolvedBy.UserID,
-		Name:     v.ResolvedBy.Name,
-		Email:    v.ResolvedBy.Email,
-		Username: v.ResolvedBy.Username,
+		UserID: v.ResolvedBy.UserID,
+		Name:   v.ResolvedBy.Name,
+		Email:  v.ResolvedBy.Email,
 	}
 
 	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
@@ -249,10 +248,9 @@ func (t *TicketImpl) AssignTicket(v *schema.ValidateAssignTicket) (*model.Ticket
 	var ticket *model.Ticket
 
 	assignedTo := &model.UserModel{
-		UserID:   v.AssignedTo.UserID,
-		Name:     v.AssignedTo.Name,
-		Email:    v.AssignedTo.Email,
-		Username: v.AssignedTo.Username,
+		UserID: v.AssignedTo.UserID,
+		Name:   v.AssignedTo.Name,
+		Email:  v.AssignedTo.Email,
 	}
 
 	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
@@ -286,9 +284,6 @@ func (t *TicketImpl) CloseTicket(v *schema.ValidateCloseTicket) (*model.Ticket, 
 	if v.ClosedBy.Email != "" {
 		closedBy.Email = v.ClosedBy.Email
 	}
-	if v.ClosedBy.Username != "" {
-		closedBy.Username = v.ClosedBy.Username
-	}
 
 	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
 	filter := bson.M{"_id": v.TicketID}
@@ -321,9 +316,6 @@ func (t *TicketImpl) ConversationReply(v *schema.ValidateConversationReply) (*mo
 	}
 	if v.CreatedBy.Email != "" {
 		createdBy.Email = v.CreatedBy.Email
-	}
-	if v.CreatedBy.Username != "" {
-		createdBy.Username = v.CreatedBy.Username
 	}
 
 	// inserting conversation into mongodb
@@ -375,11 +367,10 @@ func (t *TicketImpl) ReplyToAllTickets(v *schema.ValidateReplyToAllTickets) (boo
 	now := time.Now().UTC()
 	var conversations []interface{}
 	createdBy := &model.UserModel{
-		Type:     v.UserTye,
-		UserID:   v.CreatedBy.UserID,
-		Name:     v.CreatedBy.Name,
-		Email:    v.CreatedBy.Email,
-		Username: v.CreatedBy.Username,
+		Type:   v.UserTye,
+		UserID: v.CreatedBy.UserID,
+		Name:   v.CreatedBy.Name,
+		Email:  v.CreatedBy.Email,
 	}
 	for _, ticket := range v.TicketIDs {
 		// inserting conversation into mongodb
