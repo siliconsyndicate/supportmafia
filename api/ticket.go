@@ -218,10 +218,9 @@ func (a *API) resolveTicket(requestCTX *handler.RequestContext, w http.ResponseW
 	}
 
 	resolveTicketForm.ResolvedBy = &schema.UserModel{
-		UserID:   requestCTX.UserClaim.(*auth.UserClaim).ID,
-		Name:     requestCTX.UserClaim.(*auth.UserClaim).Name,
-		Email:    requestCTX.UserClaim.(*auth.UserClaim).Email,
-		Username: requestCTX.UserClaim.(*auth.UserClaim).Username,
+		UserID: requestCTX.UserClaim.(*auth.UserClaim).ID,
+		Name:   requestCTX.UserClaim.(*auth.UserClaim).Name,
+		Email:  requestCTX.UserClaim.(*auth.UserClaim).Email,
 	}
 
 	//Logging request data for tracking
@@ -274,10 +273,9 @@ func (a *API) assignTicket(requestCTX *handler.RequestContext, w http.ResponseWr
 	}
 
 	assignTicketForm.AssignedTo = &schema.UserModel{
-		UserID:   requestCTX.UserClaim.(*auth.UserClaim).ID,
-		Name:     requestCTX.UserClaim.(*auth.UserClaim).Name,
-		Email:    requestCTX.UserClaim.(*auth.UserClaim).Email,
-		Username: requestCTX.UserClaim.(*auth.UserClaim).Username,
+		UserID: requestCTX.UserClaim.(*auth.UserClaim).ID,
+		Name:   requestCTX.UserClaim.(*auth.UserClaim).Name,
+		Email:  requestCTX.UserClaim.(*auth.UserClaim).Email,
 	}
 
 	//Logging request data for tracking
@@ -383,10 +381,9 @@ func (a *API) closeTicketByAgent(requestCTX *handler.RequestContext, w http.Resp
 	}
 	closeTicketForm.UserTye = "agent"
 	closeTicketForm.ClosedBy = &schema.UserModel{
-		UserID:   requestCTX.UserClaim.(*auth.UserClaim).ID,
-		Name:     requestCTX.UserClaim.(*auth.UserClaim).Name,
-		Email:    requestCTX.UserClaim.(*auth.UserClaim).Email,
-		Username: requestCTX.UserClaim.(*auth.UserClaim).Username,
+		UserID: requestCTX.UserClaim.(*auth.UserClaim).ID,
+		Name:   requestCTX.UserClaim.(*auth.UserClaim).Name,
+		Email:  requestCTX.UserClaim.(*auth.UserClaim).Email,
 	}
 
 	//Logging request data for tracking
@@ -563,10 +560,9 @@ func (a *API) conversationReplyByAgent(requestCTX *handler.RequestContext, w htt
 	conversationReplyForm.Attachments = attachemnts
 	conversationReplyForm.UserTye = "agent"
 	conversationReplyForm.CreatedBy = &schema.UserModel{
-		UserID:   requestCTX.UserClaim.(*auth.UserClaim).ID,
-		Name:     requestCTX.UserClaim.(*auth.UserClaim).Name,
-		Email:    requestCTX.UserClaim.(*auth.UserClaim).Email,
-		Username: requestCTX.UserClaim.(*auth.UserClaim).Username,
+		UserID: requestCTX.UserClaim.(*auth.UserClaim).ID,
+		Name:   requestCTX.UserClaim.(*auth.UserClaim).Name,
+		Email:  requestCTX.UserClaim.(*auth.UserClaim).Email,
 	}
 
 	//Logging request data for tracking
@@ -703,10 +699,9 @@ func (a *API) replyToAllTickets(requestCTX *handler.RequestContext, w http.Respo
 	replyToAllTicketsForm.Attachments = attachemnts
 	replyToAllTicketsForm.UserTye = "agent"
 	replyToAllTicketsForm.CreatedBy = &schema.UserModel{
-		UserID:   requestCTX.UserClaim.(*auth.UserClaim).ID,
-		Name:     requestCTX.UserClaim.(*auth.UserClaim).Name,
-		Email:    requestCTX.UserClaim.(*auth.UserClaim).Email,
-		Username: requestCTX.UserClaim.(*auth.UserClaim).Username,
+		UserID: requestCTX.UserClaim.(*auth.UserClaim).ID,
+		Name:   requestCTX.UserClaim.(*auth.UserClaim).Name,
+		Email:  requestCTX.UserClaim.(*auth.UserClaim).Email,
 	}
 
 	//Logging request data for tracking

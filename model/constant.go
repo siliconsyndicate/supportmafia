@@ -10,7 +10,6 @@ const Authentication string = "Authentication"
 const (
 	SampleColl       = "sample"
 	TicketColl       = "ticket"
-	AgentColl        = "agent"
 	UserColl         = "user"
 	ConversationColl = "conversation"
 )

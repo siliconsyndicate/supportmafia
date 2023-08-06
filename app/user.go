@@ -241,16 +241,15 @@ func (a *UserImpl) SignUp(v *schema.ValidateSignUpForm) (*model.User, error) {
 		err := errors.New("User with this email already exists", &errors.DBError)
 		return nil, err
 	}
-	return a.createUser(v.Name, v.Username, v.Email, v.Password, v.Gender)
+	return a.createUser(v.Name, v.Email, v.Password, v.Gender)
 }
 
 // createUser creates user while signUp
-func (a *UserImpl) createUser(name, username, email, password, gender string) (*model.User, error) {
+func (a *UserImpl) createUser(name, email, password, gender string) (*model.User, error) {
 	now := time.Now()
 	var wg sync.WaitGroup
 	user := &model.User{
 		Name:      name,
-		Username:  username,
 		Email:     strings.ToLower(email),
 		CreatedAt: &now,
 	}
@@ -944,6 +943,9 @@ func (u *UserImpl) GoogleLogin(v *model.GooleUserData) (*schema.LoginResponse, *
 		return nil, nil, e
 	}
 	if v.Hd == nil {
+		if *v.Hd != "leanafy.com" {
+			return nil, nil, errors.New("Access Denied! You are mot a leanafy user.", &errors.PermissionDenied)
+		}
 		return nil, nil, errors.New("Access Denied! Please login with your business email.", &errors.PermissionDenied)
 	}
 	if emailCount > 0 {

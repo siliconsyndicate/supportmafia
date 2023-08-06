@@ -37,7 +37,6 @@ type UserClaim struct {
 	Session        []UserSessionDetails `json:"session,omitempty" bson:"session,omitempty"`
 	Name           string               `json:"name,omitempty" bson:"name,omitempty"`
 	Email          string               `json:"email,omitempty" bson:"email,omitempty"`
-	Username       string               `json:"username,omitempty" bson:"username,omitempty"`
 	OrganizationID *primitive.ObjectID  `json:"organization_id,omitempty" bson:"organization_id,omitempty"`
 	EmailVerified  bool                 `json:"email_verified,omitempty" bson:"email_verified,omitempty"`
 	CreatedAt      *time.Time           `json:"created_at,omitempty" bson:"created_at,omitempty"`

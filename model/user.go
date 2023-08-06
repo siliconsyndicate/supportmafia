@@ -20,7 +20,6 @@ type User struct {
 	ResetCodeExpiration *time.Time           `json:"reset_code_expiration,omitempty" bson:"reset_code_expiration,omitempty"`
 	ConfirmationCode    string               `json:"confirmation_code,omitempty" bson:"confirmation_code,omitempty"`
 	Email               string               `json:"email,omitempty" bson:"email,omitempty"`
-	Username            string               `json:"username,omitempty" bson:"username,omitempty"`
 	Name                string               `json:"name,omitempty" bson:"name,omitempty"`
 	OrganizationID      *primitive.ObjectID  `json:"organization_id,omitempty" bson:"organization_id,omitempty"`
 	EmailVerifiedAt     *time.Time           `json:"email_verified_at,omitempty" bson:"email_verified_at,omitempty"`
@@ -85,7 +84,6 @@ func (u *User) SetClaim(us *auth.UserClaim) {
 	us.Email = u.Email
 	us.Name = u.Name
 	us.Image = u.Image
-	us.Username = u.Username
 	us.IsDeactivated = u.IsDeactivated
 	us.DeactivatedAt = u.DeactivatedAt
 	us.DeactivatedBy = u.DeactivatedBy
