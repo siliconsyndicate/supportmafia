@@ -28,6 +28,7 @@ type Ticket interface {
 	ConversationReply(*schema.ValidateConversationReply) (*model.Conversation, error)
 	UserFeedback(*schema.ValidateUserFeedback) (*model.Ticket, error)
 	ReplyToAllTickets(*schema.ValidateReplyToAllTickets) (bool, error)
+	GetTicketConversation(primitive.ObjectID) ([]model.Conversation, error)
 }
 
 // TicketOpts contains arguments to be accepted for new instance of Ticket service
@@ -117,10 +118,7 @@ func (t *TicketImpl) CreateTicket(v *schema.ValidateCreateTicket) (*model.Ticket
 			Message:     ticket.Description,
 			Attachments: ticket.Attachments,
 			CreatedAt:   &now,
-			CreatedBy: &model.UserModel{
-				UserID: v.CreatedBy.UserID,
-				Name:   v.CreatedBy.Name,
-			},
+			CreatedBy:   "user",
 		}
 		ress, err := t.DB.Collection(model.ConversationColl).InsertOne(context.TODO(), conversation)
 		if err != nil {
@@ -276,15 +274,6 @@ func (t *TicketImpl) CloseTicket(v *schema.ValidateCloseTicket) (*model.Ticket, 
 	now := time.Now().UTC()
 	var ticket *model.Ticket
 
-	closedBy := &model.UserModel{
-		Type:   v.UserTye,
-		UserID: v.ClosedBy.UserID,
-		Name:   v.ClosedBy.Name,
-	}
-	if v.ClosedBy.Email != "" {
-		closedBy.Email = v.ClosedBy.Email
-	}
-
 	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
 	filter := bson.M{"_id": v.TicketID}
 	update := bson.M{
@@ -292,7 +281,7 @@ func (t *TicketImpl) CloseTicket(v *schema.ValidateCloseTicket) (*model.Ticket, 
 			"status":    "closed",
 			"is_closed": true,
 			"closed_at": &now,
-			"closed_by": closedBy,
+			"closed_by": v.UserTye,
 		},
 	}
 	if err := t.DB.Collection(model.TicketColl).FindOneAndUpdate(context.TODO(), filter, update, opts).Decode(&ticket); err != nil {
@@ -309,22 +298,13 @@ func (t *TicketImpl) CloseTicket(v *schema.ValidateCloseTicket) (*model.Ticket, 
 func (t *TicketImpl) ConversationReply(v *schema.ValidateConversationReply) (*model.Conversation, error) {
 	now := time.Now().UTC()
 
-	createdBy := &model.UserModel{
-		Type:   v.UserTye,
-		UserID: v.CreatedBy.UserID,
-		Name:   v.CreatedBy.Name,
-	}
-	if v.CreatedBy.Email != "" {
-		createdBy.Email = v.CreatedBy.Email
-	}
-
 	// inserting conversation into mongodb
 	conversation := &model.Conversation{
 		TicketID:    v.TicketID,
 		Message:     v.Message,
 		Attachments: v.Attachments,
 		CreatedAt:   &now,
-		CreatedBy:   createdBy,
+		CreatedBy:   v.UserTye,
 	}
 	res, err := t.DB.Collection(model.ConversationColl).InsertOne(context.TODO(), conversation)
 	if err != nil {
@@ -366,19 +346,14 @@ func (t *TicketImpl) UserFeedback(v *schema.ValidateUserFeedback) (*model.Ticket
 func (t *TicketImpl) ReplyToAllTickets(v *schema.ValidateReplyToAllTickets) (bool, error) {
 	now := time.Now().UTC()
 	var conversations []interface{}
-	createdBy := &model.UserModel{
-		Type:   v.UserTye,
-		UserID: v.CreatedBy.UserID,
-		Name:   v.CreatedBy.Name,
-		Email:  v.CreatedBy.Email,
-	}
+
 	for _, ticket := range v.TicketIDs {
 		// inserting conversation into mongodb
 		conversation := model.Conversation{
 			TicketID:  &ticket,
 			Message:   v.Message,
 			CreatedAt: &now,
-			CreatedBy: createdBy,
+			CreatedBy: "agent",
 		}
 		if len(v.Attachments) > 0 {
 			conversation.Attachments = v.Attachments
@@ -392,4 +367,20 @@ func (t *TicketImpl) ReplyToAllTickets(v *schema.ValidateReplyToAllTickets) (boo
 	}
 
 	return true, nil
+}
+
+func (t *TicketImpl) GetTicketConversation(ticketID primitive.ObjectID) ([]model.Conversation, error) {
+	var conversations []model.Conversation
+
+	//fetching conversations from mongodb based on ticketID
+	filter := bson.M{"ticket_id": ticketID}
+	cur, err := t.DB.Collection(model.ConversationColl).Find(context.Background(), filter)
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to query database", &errors.DBError)
+	}
+	if err := cur.All(context.Background(), &conversations); err != nil {
+		return nil, errors.Wrap(err, "Failed to fetch conversations", &errors.DBError)
+	}
+
+	return conversations, nil
 }

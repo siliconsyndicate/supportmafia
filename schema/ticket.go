@@ -64,5 +64,4 @@ type ValidateReplyToAllTickets struct {
 	Attachments []string             `json:"attachments"`
 	NumFile     int                  `json:"num_file"`
 	CreatedBy   *UserModel           `json:"assigned_user"`
-	UserTye     string               `json:"user_type"`
 }

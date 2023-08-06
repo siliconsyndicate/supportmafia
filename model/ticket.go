@@ -24,7 +24,7 @@ type Ticket struct {
 	ResolvedBy  *UserModel          `json:"resolved_by,omitempty" bson:"resolved_by,omitempty"`
 	ResolvedAt  *time.Time          `json:"resolved_at,omitempty" bson:"resolved_at,omitempty"`
 	IsClosed    bool                `json:"is_closed,omitempty" bson:"is_closed,omitempty"`
-	ClosedBy    *UserModel          `json:"closed_by,omitempty" bson:"closed_by,omitempty"`
+	ClosedBy    string              `json:"closed_by,omitempty" bson:"closed_by,omitempty"`
 	ClosedAt    *time.Time          `json:"closed_at,omitempty" bson:"closed_at,omitempty"`
 	Traces      []Trace             `json:"traces,omitempty" bson:"traces,omitempty"`
 	Platform    string              `json:"platform,omitempty" bson:"platform,omitempty"`
@@ -46,5 +46,5 @@ type Conversation struct {
 	Message     string              `json:"message,omitempty" bson:"message,omitempty"`
 	Attachments []string            `json:"attachments,omitempty" bson:"attachments,omitempty"` //urls
 	CreatedAt   *time.Time          `json:"created_at,omitempty" bson:"created_at,omitempty"`
-	CreatedBy   *UserModel          `json:"created_by,omitempty" bson:"created_by,omitempty"`
+	CreatedBy   string              `json:"created_by,omitempty" bson:"created_by,omitempty"`
 }

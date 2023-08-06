@@ -38,5 +38,6 @@ func (a *API) InitRoutes() {
 	a.Router.Ticket.Handle("/conversation/reply/agent", a.requestWithAuthHandler(a.conversationReplyByAgent)).Methods("POST")
 	a.Router.Ticket.Handle("/feedback", a.requestWithAuthHandler(a.userFeedback)).Methods("POST")
 	a.Router.Ticket.Handle("/reply-all", a.requestWithAuthHandler(a.replyToAllTickets)).Methods("POST")
+	a.Router.Ticket.Handle("/conversation/get", a.requestWithAuthHandler(a.getTicketConversation)).Methods("GET")
 
 }
