@@ -326,9 +326,6 @@ func (a *API) closeTicketByUser(requestCTX *handler.RequestContext, w http.Respo
 		requestCTX.SetErrs(errs, 400)
 		return
 	}
-	if closeTicketForm.ClosedBy == nil {
-		requestCTX.SetErr(errors.New("User data reqiired.", &errors.BadRequest), 400)
-	}
 	closeTicketForm.UserTye = "user"
 
 	//Logging request data for tracking
@@ -380,11 +377,6 @@ func (a *API) closeTicketByAgent(requestCTX *handler.RequestContext, w http.Resp
 		return
 	}
 	closeTicketForm.UserTye = "agent"
-	closeTicketForm.ClosedBy = &schema.UserModel{
-		UserID: requestCTX.UserClaim.(*auth.UserClaim).ID,
-		Name:   requestCTX.UserClaim.(*auth.UserClaim).Name,
-		Email:  requestCTX.UserClaim.(*auth.UserClaim).Email,
-	}
 
 	//Logging request data for tracking
 	userClaim, _ := json.Marshal(requestCTX.UserClaim.(*auth.UserClaim))
@@ -469,10 +461,6 @@ func (a *API) conversationReplyByUser(requestCTX *handler.RequestContext, w http
 		}
 	}
 	conversationReplyForm.Attachments = attachemnts
-
-	if conversationReplyForm.CreatedBy == nil {
-		requestCTX.SetErr(errors.New("User data reqiired.", &errors.BadRequest), 400)
-	}
 	conversationReplyForm.UserTye = "user"
 
 	//Logging request data for tracking
@@ -559,11 +547,6 @@ func (a *API) conversationReplyByAgent(requestCTX *handler.RequestContext, w htt
 	}
 	conversationReplyForm.Attachments = attachemnts
 	conversationReplyForm.UserTye = "agent"
-	conversationReplyForm.CreatedBy = &schema.UserModel{
-		UserID: requestCTX.UserClaim.(*auth.UserClaim).ID,
-		Name:   requestCTX.UserClaim.(*auth.UserClaim).Name,
-		Email:  requestCTX.UserClaim.(*auth.UserClaim).Email,
-	}
 
 	//Logging request data for tracking
 	userClaim, _ := json.Marshal(requestCTX.UserClaim.(*auth.UserClaim))
@@ -697,12 +680,6 @@ func (a *API) replyToAllTickets(requestCTX *handler.RequestContext, w http.Respo
 		}
 	}
 	replyToAllTicketsForm.Attachments = attachemnts
-	replyToAllTicketsForm.UserTye = "agent"
-	replyToAllTicketsForm.CreatedBy = &schema.UserModel{
-		UserID: requestCTX.UserClaim.(*auth.UserClaim).ID,
-		Name:   requestCTX.UserClaim.(*auth.UserClaim).Name,
-		Email:  requestCTX.UserClaim.(*auth.UserClaim).Email,
-	}
 
 	//Logging request data for tracking
 	userClaim, _ := json.Marshal(requestCTX.UserClaim.(*auth.UserClaim))
@@ -721,4 +698,26 @@ func (a *API) replyToAllTickets(requestCTX *handler.RequestContext, w http.Respo
 	a.Logger.Log().Str("request_id", requestCTX.RequestID).Str("action", "reply_to_all_tickets").Str("request_status", "responding").Hex("response_data", response).Str("status_code", "200").Msg("Reply To All Tickets response data.")
 
 	requestCTX.SetAppResponse(conversation, 200)
+}
+
+// getTicketConversation fetches ticket conversation by ticket id
+func (a *API) getTicketConversation(requestCTX *handler.RequestContext, w http.ResponseWriter, r *http.Request) {
+	// Checks and handels if any panic occurs
+	defer a.App.Utils.HandlePanic(requestCTX)
+
+	// fetching ticket id from request query
+	ticketID, err := primitive.ObjectIDFromHex(r.URL.Query().Get("ticket_id"))
+	if err != nil {
+		requestCTX.SetErr(errors.New("Invalid ticketID in request query", &errors.BadRequest), 400)
+		return
+	}
+
+	// Calling GetTicketConversation function and passing ticketID as paramaters
+	arn, err := a.App.Ticket.GetTicketConversation(ticketID)
+	if err != nil {
+		requestCTX.SetErr(err, 500)
+		return
+	}
+
+	requestCTX.SetAppResponse(arn, 200)
 }
