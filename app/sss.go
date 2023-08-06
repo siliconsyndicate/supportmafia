@@ -18,7 +18,7 @@ import (
 
 // SSS defines methods defined in aws sss sdk
 type SSS interface {
-	AddFileToS3(string, string, []byte) (string, error)
+	AddFileToS3(string, string, int64, []byte) (string, error)
 	AddFileToS3WithID(string, string, int64, []byte) (string, error)
 }
 
@@ -52,7 +52,7 @@ func NewSSSImpl(opts *SSSImplOpts) SSS {
 	return &awss3
 }
 
-func (a *SSSImpl) AddFileToS3(fileName, bucket string, buffer []byte) (string, error) {
+func (a *SSSImpl) AddFileToS3(fileName, bucket string, fileSize int64, buffer []byte) (string, error) {
 	timeStamp := time.Now().String()
 	//using regex to eliminate all the special characters from timestamp
 	re1, err := regexp.Compile(`[^\w]`)
@@ -77,7 +77,7 @@ func (a *SSSImpl) AddFileToS3(fileName, bucket string, buffer []byte) (string, e
 		Key:                  aws.String(fileName),
 		ACL:                  aws.String("private"),
 		Body:                 bytes.NewReader(buffer),
-		ContentLength:        aws.Int64(int64(len(buffer))),
+		ContentLength:        aws.Int64(fileSize),
 		ContentType:          aws.String(http.DetectContentType(buffer)),
 		ContentDisposition:   aws.String("attachment"),
 		ServerSideEncryption: aws.String("AES256"),

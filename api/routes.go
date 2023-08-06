@@ -25,4 +25,18 @@ func (a *API) InitRoutes() {
 	a.Router.Auth.Handle("/delete-all-sessions", a.requestWithAuthHandler(a.deleteAllUserSessions)).Methods("GET")
 	a.Router.Auth.Handle("/edit-user", a.requestWithAuthHandler(a.editUser)).Methods("POST")
 
+	// Ticket
+	a.Router.Ticket.Handle("/create", a.requestWithAuthHandler(a.createTicket)).Methods("POST")
+	a.Router.Ticket.Handle("/get-all", a.requestWithAuthHandler(a.getTicketAll)).Methods("GET")
+	a.Router.Ticket.Handle("/get", a.requestWithAuthHandler(a.getTicketByID)).Methods("GET")
+	a.Router.Ticket.Handle("/prioritize", a.requestWithAuthHandler(a.prioritizeTicket)).Methods("POST")
+	a.Router.Ticket.Handle("/resolve", a.requestWithAuthHandler(a.resolveTicket)).Methods("POST")
+	a.Router.Ticket.Handle("/assign", a.requestWithAuthHandler(a.assignTicket)).Methods("POST")
+	a.Router.Ticket.Handle("/close/user", a.requestWithAuthHandler(a.closeTicketByUser)).Methods("POST")
+	a.Router.Ticket.Handle("/close/agent", a.requestWithAuthHandler(a.closeTicketByAgent)).Methods("POST")
+	a.Router.Ticket.Handle("/conversation/reply/user", a.requestWithAuthHandler(a.conversationReplyByUser)).Methods("POST")
+	a.Router.Ticket.Handle("/conversation/reply/agent", a.requestWithAuthHandler(a.conversationReplyByAgent)).Methods("POST")
+	a.Router.Ticket.Handle("/feedback", a.requestWithAuthHandler(a.userFeedback)).Methods("POST")
+	a.Router.Ticket.Handle("/reply-all", a.requestWithAuthHandler(a.replyToAllTickets)).Methods("POST")
+
 }

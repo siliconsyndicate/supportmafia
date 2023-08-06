@@ -37,7 +37,7 @@ type UserClaim struct {
 	Session        []UserSessionDetails `json:"session,omitempty" bson:"session,omitempty"`
 	Name           string               `json:"name,omitempty" bson:"name,omitempty"`
 	Email          string               `json:"email,omitempty" bson:"email,omitempty"`
-	PhoneNumber    string               `json:"phone_number,omitempty" bson:"phone_number,omitempty"`
+	Username       string               `json:"username,omitempty" bson:"username,omitempty"`
 	OrganizationID *primitive.ObjectID  `json:"organization_id,omitempty" bson:"organization_id,omitempty"`
 	EmailVerified  bool                 `json:"email_verified,omitempty" bson:"email_verified,omitempty"`
 	CreatedAt      *time.Time           `json:"created_at,omitempty" bson:"created_at,omitempty"`
@@ -77,10 +77,10 @@ type UserSessionDetails struct {
 
 // CreatedBy contains info about user who is creating something
 type UserModel struct {
-	UserID      primitive.ObjectID `json:"user_id,omitempty" bson:"user_id,omitempty"`
-	PhoneNumber string             `json:"phone_number,omitempty" bson:"phone_number,omitempty"`
-	Name        string             `json:"name,omitempty" bson:"name,omitempty"`
-	Email       string             `json:"email,omitempty" bson:"email,omitempty"`
+	UserID   primitive.ObjectID `json:"user_id,omitempty" bson:"user_id,omitempty"`
+	Username string             `json:"username,omitempty" bson:"username,omitempty"`
+	Name     string             `json:"name,omitempty" bson:"name,omitempty"`
+	Email    string             `json:"email,omitempty" bson:"email,omitempty"`
 }
 
 // GetJWTToken return jwt.Token with claimInfo from user claim fields

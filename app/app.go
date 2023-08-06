@@ -38,9 +38,10 @@ type App struct {
 	SSS SSS
 
 	//Services
-	Utils Utils
-	User  User
-	Auth  Auth
+	Utils  Utils
+	User   User
+	Auth   Auth
+	Ticket Ticket
 
 	// KAFKA
 	// ActivityTrackingProducer kafka.Producer

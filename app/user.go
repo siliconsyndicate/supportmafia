@@ -241,18 +241,18 @@ func (a *UserImpl) SignUp(v *schema.ValidateSignUpForm) (*model.User, error) {
 		err := errors.New("User with this email already exists", &errors.DBError)
 		return nil, err
 	}
-	return a.createUser(v.Name, v.PhoneNumber, v.Email, v.Password, v.Gender)
+	return a.createUser(v.Name, v.Username, v.Email, v.Password, v.Gender)
 }
 
 // createUser creates user while signUp
-func (a *UserImpl) createUser(name, phoneNumber, email, password, gender string) (*model.User, error) {
+func (a *UserImpl) createUser(name, username, email, password, gender string) (*model.User, error) {
 	now := time.Now()
 	var wg sync.WaitGroup
 	user := &model.User{
-		Name:        name,
-		PhoneNumber: phoneNumber,
-		Email:       strings.ToLower(email),
-		CreatedAt:   &now,
+		Name:      name,
+		Username:  username,
+		Email:     strings.ToLower(email),
+		CreatedAt: &now,
 	}
 
 	if gender != "" {
@@ -635,19 +635,19 @@ func (a *UserImpl) ResetPassword(reset *schema.ValidatePasswordResetForm) (bool,
 // 		e := errors.New("email already taken", &errors.PermissionDenied)
 // 		return false, e
 // 	}
-// 	return a.createSubUser(organizationID, v.PhoneNumber, v.Password, v.Email, v.Name, v.Gender, creatingUser)
+// 	return a.createSubUser(organizationID, v.Username, v.Password, v.Email, v.Name, v.Gender, creatingUser)
 // }
 
 // createSubUser creates a new user which is already associated with an organization and warehouse,
 // creating a new user of warehouse
-// func (a *UserImpl) createSubUser(orgID primitive.ObjectID, phoneNumber, password, email, name, gender string, creatingUser model.UserModel) (interface{}, error) {
+// func (a *UserImpl) createSubUser(orgID primitive.ObjectID, username, password, email, name, gender string, creatingUser model.UserModel) (interface{}, error) {
 // 	now := time.Now().UTC()
 // 	// mapping user data into struct
 // 	user := &model.User{
 // 		Name:        name,
 // 		Email:       email,
 // 		Gender:      gender,
-// 		PhoneNumber: phoneNumber,
+// 		Username: username,
 // 		CreatedAt:   &now,
 // 		CreatedBy:   &creatingUser,
 // 	}
@@ -870,9 +870,6 @@ func (u *UserImpl) EditUser(v *schema.ValidateEditUser, sessionID string) (*mode
 	}
 	if len(v.Name) > 0 {
 		set["name"] = v.Name
-	}
-	if len(v.PhoneNumber) > 0 {
-		set["phone_number"] = v.PhoneNumber
 	}
 	filter := bson.M{"_id": v.UserID}
 	update := bson.M{

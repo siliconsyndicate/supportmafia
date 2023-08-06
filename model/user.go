@@ -20,7 +20,7 @@ type User struct {
 	ResetCodeExpiration *time.Time           `json:"reset_code_expiration,omitempty" bson:"reset_code_expiration,omitempty"`
 	ConfirmationCode    string               `json:"confirmation_code,omitempty" bson:"confirmation_code,omitempty"`
 	Email               string               `json:"email,omitempty" bson:"email,omitempty"`
-	PhoneNumber         string               `json:"phone_number,omitempty" bson:"phone_number,omitempty"`
+	Username            string               `json:"username,omitempty" bson:"username,omitempty"`
 	Name                string               `json:"name,omitempty" bson:"name,omitempty"`
 	OrganizationID      *primitive.ObjectID  `json:"organization_id,omitempty" bson:"organization_id,omitempty"`
 	EmailVerifiedAt     *time.Time           `json:"email_verified_at,omitempty" bson:"email_verified_at,omitempty"`
@@ -85,7 +85,7 @@ func (u *User) SetClaim(us *auth.UserClaim) {
 	us.Email = u.Email
 	us.Name = u.Name
 	us.Image = u.Image
-	us.PhoneNumber = u.PhoneNumber
+	us.Username = u.Username
 	us.IsDeactivated = u.IsDeactivated
 	us.DeactivatedAt = u.DeactivatedAt
 	us.DeactivatedBy = u.DeactivatedBy
@@ -94,10 +94,10 @@ func (u *User) SetClaim(us *auth.UserClaim) {
 	us.CreatedAt = u.CreatedAt
 	if u.CreatedBy != nil {
 		us.CreatedBy = &auth.UserModel{
-			UserID:      u.CreatedBy.UserID,
-			PhoneNumber: u.CreatedBy.PhoneNumber,
-			Email:       u.CreatedBy.Email,
-			Name:        u.CreatedBy.Name,
+			UserID:   u.CreatedBy.UserID,
+			Username: u.CreatedBy.Username,
+			Email:    u.CreatedBy.Email,
+			Name:     u.CreatedBy.Name,
 		}
 	}
 	us.UpdatedAt = u.UpdatedAt
@@ -132,10 +132,11 @@ type UserSessionDetails struct {
 
 // CreatedBy contains info about user who is creating something
 type UserModel struct {
-	UserID      primitive.ObjectID `json:"user_id,omitempty" bson:"user_id,omitempty"`
-	PhoneNumber string             `json:"phone_number,omitempty" bson:"phone_number,omitempty"`
-	Name        string             `json:"name,omitempty" bson:"name,omitempty"`
-	Email       string             `json:"email,omitempty" bson:"email,omitempty"`
+	Type     string             `json:"type,omitempty" bson:"type,omitempty"`
+	UserID   primitive.ObjectID `json:"user_id,omitempty" bson:"user_id,omitempty"`
+	Username string             `json:"username,omitempty" bson:"username,omitempty"`
+	Name     string             `json:"name,omitempty" bson:"name,omitempty"`
+	Email    string             `json:"email,omitempty" bson:"email,omitempty"`
 }
 
 type GooleUserData struct {
