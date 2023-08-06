@@ -9,11 +9,8 @@ const Authentication string = "Authentication"
 // Mongodb collections
 const (
 	SampleColl       = "sample"
-	SprintColl       = "sprint"
-	UserColl         = "users"
-	OrganizationColl = "organization"
-	TeamsColl        = "teams"
-	MilestonesColl   = "milestones"
-	TasksColl        = "tasks"
-	UserStoriesColl  = "user_stories"
+	TicketColl       = "ticket"
+	AgentColl        = "agent"
+	UserColl         = "user"
+	ConversationColl = "conversation"
 )

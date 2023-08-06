@@ -38,15 +38,11 @@ type Options struct {
 
 // Router stores all the endpoints available for the server to respond.
 type Router struct {
-	Root         *mux.Router
-	APIRoot      *mux.Router
-	StaticRoot   *mux.Router
-	Auth         *mux.Router
-	Organization *mux.Router
-	Teams        *mux.Router
-	Milestones   *mux.Router
-	Sprints      *mux.Router
-	Tasks        *mux.Router
+	Root       *mux.Router
+	APIRoot    *mux.Router
+	StaticRoot *mux.Router
+	Auth       *mux.Router
+	Ticket     *mux.Router
 }
 
 // NewAPI returns API instance
@@ -68,11 +64,7 @@ func (a *API) setupRoutes() {
 	a.Router.Root = a.MainRouter
 	a.Router.APIRoot = a.MainRouter.PathPrefix("/api").Subrouter()
 	a.Router.Auth = a.MainRouter.PathPrefix("/auth").Subrouter()
-	a.Router.Organization = a.MainRouter.PathPrefix("/organization").Subrouter()
-	a.Router.Teams = a.MainRouter.PathPrefix("/teams").Subrouter()
-	a.Router.Milestones = a.MainRouter.PathPrefix("/milestones").Subrouter()
-	a.Router.Sprints = a.MainRouter.PathPrefix("/sprints").Subrouter()
-	a.Router.Tasks = a.MainRouter.PathPrefix("/tasks").Subrouter()
+	a.Router.Ticket = a.MainRouter.PathPrefix("/ticket").Subrouter()
 	a.InitRoutes()
 	if a.Config.EnableStaticRoute {
 		a.Router.StaticRoot = a.MainRouter.PathPrefix("/static").Subrouter()

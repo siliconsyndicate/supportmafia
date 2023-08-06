@@ -20,4 +20,10 @@ func InitService(a *App) {
 		Logger: a.Logger,
 	})
 
+	a.Ticket = InitTicket(&TicketOpts{
+		App:    a,
+		DB:     a.MongoDB.Client.Database(a.Config.UserConfig.DBName),
+		Logger: a.Logger,
+	})
+
 }
