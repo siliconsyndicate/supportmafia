@@ -90,8 +90,3 @@ func (a *API) socialLogout(requestCTX *handler.RequestContext, w http.ResponseWr
 
 	requestCTX.SetAppResponse(true, 200)
 }
-
-func (a *API) socialExample(requestCTX *handler.RequestContext, w http.ResponseWriter, r *http.Request) {
-
-	requestCTX.SetAppResponse(true, 200)
-}

@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"strings"
 	"supportmafia/model"
 	"supportmafia/schema"
@@ -236,10 +235,16 @@ func (a *AuthImpl) updateTokenID(userID primitive.ObjectID, sessionID, tokenID s
 }
 
 func (a *AuthImpl) SocialAuth(socialUser goth.User) (*schema.SocialAuthResponse, error) {
-	now := time.Now().UTC()
-	fmt.Printf("%+v\n", socialUser)
+	var dbuser model.User
+	err := a.DB.Collection(model.UserColl).FindOne(context.TODO(), bson.M{"email": socialUser.Email}).Decode(&dbuser)
+	if err != nil {
+		err := errors.Wrap(err, "Failed to get user", &errors.DBError)
+		return nil, err
+	}
 
-	claims := &auth.UserClaim{}
+	now := time.Now().UTC()
+
+	claims := &auth.UserClaim{ID: *dbuser.ID}
 	token_id := uuid.NewV4().String()
 	accessToken, refreshToken := a.signSocialToken(claims, token_id)
 
@@ -265,12 +270,6 @@ func (a *AuthImpl) SocialAuth(socialUser goth.User) (*schema.SocialAuthResponse,
 			return nil, errors.Wrap(err1, "Failed to update the user", &errors.DBError)
 		}
 
-		var dbuser model.User
-		err := a.DB.Collection(model.UserColl).FindOne(context.TODO(), bson.M{"email": socialUser.Email}).Decode(&dbuser)
-		if err != nil {
-			err := errors.Wrap(err, "Failed to get user", &errors.DBError)
-			return nil, err
-		}
 		user.ID = dbuser.ID
 
 		resp := &schema.SocialAuthResponse{

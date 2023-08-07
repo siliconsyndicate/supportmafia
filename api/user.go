@@ -45,7 +45,14 @@ func (a *API) getLoggedInUser(requestCTX *handler.RequestContext, w http.Respons
 	// Checks and handels if any panic occurs
 	defer a.App.Utils.HandlePanic(requestCTX)
 
-	requestCTX.SetAppResponse(map[string]interface{}{"user": requestCTX.UserClaim.(*auth.UserClaim)}, 200)
+	// calling UnSetUserSessionID function and passing email and session id as paramaters, which unsets the session from user in user document
+	user, err := a.App.User.GetUserByID(requestCTX.UserClaim.(*auth.UserClaim).ID)
+	if err != nil {
+		requestCTX.SetErr(errors.Wrap(err, "Failed to get user by ID", &errors.DBError), 400)
+		return
+	}
+
+	requestCTX.SetAppResponse(user, 200)
 }
 
 // login logs in and user

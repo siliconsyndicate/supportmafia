@@ -6,17 +6,11 @@ func (a *API) InitRoutes() {
 	a.Router.Root.Handle("/", a.requestHandler(a.redirect)).Methods("GET")
 	a.Router.Root.Handle("/logout", a.requestHandler(a.logoutUser)).Methods("GET")
 
-	// Social
-	a.Router.Auth.Handle("/logout/{provider}", a.requestHandler(a.socialLogout)).Methods("GET")
-	a.Router.Auth.Handle("/social_example", a.requestWithAuthHandler(a.socialExample)).Methods("GET")
-	a.Router.Auth.Handle("/{provider}/callback", a.requestHandler(a.handleCallback)).Methods("GET")
-	a.Router.Auth.Handle("/{provider}", a.requestHandler(a.socialAuth)).Methods("GET")
-
 	// Authentication
 	a.Router.Auth.Handle("/refresh_token", a.requestHandler(a.generateRefreshToken)).Methods("POST")
-	a.Router.Auth.Handle("/get-user", a.requestWithAuthHandler(a.getLoggedInUser)).Methods("GET")
 	a.Router.Auth.Handle("/sign-in", a.requestHandler(a.login)).Methods("POST")
 	a.Router.Auth.Handle("/sign-up", a.requestHandler(a.signUp)).Methods("POST")
+	a.Router.Auth.Handle("/get-user", a.requestWithAuthHandler(a.getLoggedInUser)).Methods("GET")
 	a.Router.Auth.Handle("/google/login", a.requestHandler(a.googleLogin)).Methods("GET")
 	a.Router.Auth.Handle("/google/callback", a.requestHandler(a.googleCallback)).Methods("GET")
 	a.Router.Auth.Handle("/fb/login", a.requestHandler(a.fbLogin)).Methods("GET")
@@ -30,6 +24,11 @@ func (a *API) InitRoutes() {
 	a.Router.Auth.Handle("/script/update_user_structure_es", a.requestWithAuthHandler(a.updateUserStructureES)).Methods("POST")
 	a.Router.Auth.Handle("/delete-all-sessions", a.requestWithAuthHandler(a.deleteAllUserSessions)).Methods("GET")
 	a.Router.Auth.Handle("/edit-user", a.requestWithAuthHandler(a.editUser)).Methods("POST")
+
+	// Social
+	a.Router.Auth.Handle("/logout/{provider}", a.requestHandler(a.socialLogout)).Methods("GET")
+	a.Router.Auth.Handle("/{provider}/callback", a.requestHandler(a.handleCallback)).Methods("GET")
+	a.Router.Auth.Handle("/{provider}", a.requestHandler(a.socialAuth)).Methods("GET")
 
 	// Ticket
 	a.Router.Ticket.Handle("/create", a.requestWithAuthHandler(a.createTicket)).Methods("POST")
