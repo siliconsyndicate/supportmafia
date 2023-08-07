@@ -15,6 +15,8 @@ require (
 	github.com/go-playground/validator/v10 v10.14.1
 	github.com/gomodule/redigo v1.8.9
 	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/sessions v1.1.1
+	github.com/markbates/goth v1.77.0
 	github.com/opensearch-project/opensearch-go v1.1.0
 	github.com/pkg/errors v0.9.1
 	github.com/rs/cors v1.9.0
@@ -41,6 +43,8 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/gorilla/context v1.1.1 // indirect
+	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/klauspost/compress v1.16.0 // indirect

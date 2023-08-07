@@ -32,6 +32,10 @@ type User struct {
 	DeactivationReason  string               `json:"deactivation_reason,omitempty" bson:"deactivation_reason,omitempty"`
 	Timezone            string               `json:"timezone,omitempty" bson:"timezone,omitempty"`
 	GoogleID            string               `json:"google_id,omitempty" bson:"google_id,omitempty"`
+	AccessToken         *string              `json:"access_token,omitempty" bson:"access_token,omitempty"`
+	RefreshToken        *string              `json:"refresh_token,omitempty" bson:"refresh_token,omitempty"`
+	ExpiresAt           *time.Time           `json:"expires_at,omitempty" bson:"expires_at,omitempty"`
+	IDToken             *string              `json:"id_token,omitempty" bson:"id_token,omitempty"`
 }
 
 // SetPassword sets hashed password string

@@ -3,6 +3,8 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"strings"
 	"supportmafia/model"
 	"supportmafia/schema"
 	"supportmafia/server/auth"
@@ -10,6 +12,7 @@ import (
 
 	"github.com/garyburd/redigo/redis"
 	"github.com/getsentry/sentry-go"
+	"github.com/markbates/goth"
 	uuid "github.com/satori/go.uuid"
 	errors "github.com/vasupal1996/goerror"
 
@@ -18,10 +21,12 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Auth interface {
 	GenerateRefreshToken(*schema.RefreshToken) (*schema.LoginResponse, error)
+	SocialAuth(goth.User) (*schema.SocialAuthResponse, error)
 }
 
 // SampleOpts contains arguments to be accepted for new instance of Sample service
@@ -50,14 +55,28 @@ func InitAuth(opts *AuthOpts) Auth {
 
 // Generate a new access and refresh token
 func (a *AuthImpl) signToken(userClaim *auth.UserClaim, token_id string) (string, string) {
-	// Access token - valid for 10 minutes
+	// Access token - valid for 60 minutes
 	userClaim.Expiry = time.Now().Add(time.Minute * 60).Unix()
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, userClaim)
 	accessTokenString, _ := accessToken.SignedString([]byte(a.App.Config.TokenAuthConfig.JWTSignKey))
 
 	// Refresh token - valid for 7 days
 	userClaim.Expiry = time.Now().Add(time.Hour * 168).Unix()
-	userClaim.TokenID = token_id
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, userClaim)
+	refreshTokenString, _ := refreshToken.SignedString([]byte(a.App.Config.TokenAuthConfig.JWTSignKey))
+
+	return accessTokenString, refreshTokenString
+}
+
+// Generate a new access and refresh token
+func (a *AuthImpl) signSocialToken(userClaim *auth.UserClaim, token_id string) (string, string) {
+	// Access token - valid for 60 minutes
+	userClaim.Expiry = time.Now().Add(time.Minute * 60).Unix()
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, userClaim)
+	accessTokenString, _ := accessToken.SignedString([]byte(a.App.Config.TokenAuthConfig.JWTSignKey))
+
+	// Refresh token - valid for 7 days
+	userClaim.Expiry = time.Now().Add(time.Hour * 168).Unix()
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, userClaim)
 	refreshTokenString, _ := refreshToken.SignedString([]byte(a.App.Config.TokenAuthConfig.JWTSignKey))
 
@@ -214,4 +233,74 @@ func (a *AuthImpl) updateTokenID(userID primitive.ObjectID, sessionID, tokenID s
 	}
 
 	return nil
+}
+
+func (a *AuthImpl) SocialAuth(socialUser goth.User) (*schema.SocialAuthResponse, error) {
+	now := time.Now().UTC()
+	fmt.Printf("%+v\n", socialUser)
+
+	claims := &auth.UserClaim{}
+	token_id := uuid.NewV4().String()
+	accessToken, refreshToken := a.signSocialToken(claims, token_id)
+
+	user := &model.User{
+		Name:        socialUser.Name,
+		Email:       strings.ToLower(socialUser.Email),
+		AccessToken: &socialUser.AccessToken,
+		ExpiresAt:   &socialUser.ExpiresAt,
+		IDToken:     &socialUser.IDToken,
+	}
+
+	// Check if the user already exists
+	userEmailCount, _ := a.DB.Collection(model.UserColl).CountDocuments(context.TODO(), bson.M{"email": socialUser.Email})
+	if userEmailCount != 0 {
+		// Update user details in db
+		// Update token
+		user.UpdatedAt = &now
+		filter := bson.M{"email": strings.ToLower(socialUser.Email)}
+		update := bson.M{"$set": user}
+		opts := options.Update().SetUpsert(true)
+		_, err1 := a.DB.Collection(model.UserColl).UpdateOne(context.TODO(), filter, update, opts)
+		if err1 != nil {
+			return nil, errors.Wrap(err1, "Failed to update the user", &errors.DBError)
+		}
+
+		var dbuser model.User
+		err := a.DB.Collection(model.UserColl).FindOne(context.TODO(), bson.M{"email": socialUser.Email}).Decode(&dbuser)
+		if err != nil {
+			err := errors.Wrap(err, "Failed to get user", &errors.DBError)
+			return nil, err
+		}
+		user.ID = dbuser.ID
+
+		resp := &schema.SocialAuthResponse{
+			User:         user,
+			AccessToken:  accessToken,
+			RefreshToken: refreshToken,
+		}
+
+		// Return user
+		return resp, nil
+	}
+
+	// Create User
+	user.CreatedAt = &now
+	user.RefreshToken = &socialUser.RefreshToken
+	res, err := a.DB.Collection(model.UserColl).InsertOne(context.TODO(), user)
+	if err != nil {
+		err := errors.Wrap(err, "Failed to insert user", &errors.DBError)
+		return nil, err
+	}
+	if res.InsertedID != nil {
+		userID := res.InsertedID.(primitive.ObjectID)
+		user.ID = &userID
+	}
+
+	resp := &schema.SocialAuthResponse{
+		User:         user,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}
+
+	return resp, nil
 }

@@ -6,6 +6,12 @@ func (a *API) InitRoutes() {
 	a.Router.Root.Handle("/", a.requestHandler(a.redirect)).Methods("GET")
 	a.Router.Root.Handle("/logout", a.requestHandler(a.logoutUser)).Methods("GET")
 
+	// Social
+	a.Router.Auth.Handle("/logout/{provider}", a.requestHandler(a.socialLogout)).Methods("GET")
+	a.Router.Auth.Handle("/social_example", a.requestWithAuthHandler(a.socialExample)).Methods("GET")
+	a.Router.Auth.Handle("/{provider}/callback", a.requestHandler(a.handleCallback)).Methods("GET")
+	a.Router.Auth.Handle("/{provider}", a.requestHandler(a.socialAuth)).Methods("GET")
+
 	// Authentication
 	a.Router.Auth.Handle("/refresh_token", a.requestHandler(a.generateRefreshToken)).Methods("POST")
 	a.Router.Auth.Handle("/get-user", a.requestWithAuthHandler(a.getLoggedInUser)).Methods("GET")

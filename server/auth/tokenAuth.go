@@ -14,7 +14,7 @@ const HeaderRequestID = "X-Request-ID"
 // TokenAuth defines method for implementing token authentication
 type TokenAuth interface {
 	SignToken(Claim) (string, error)
-	VerifyToken(string) (Claim, string, error)
+	VerifyToken(string) (Claim, error)
 }
 
 // Claim defines custom token claim type methods.
