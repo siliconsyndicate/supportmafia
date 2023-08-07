@@ -235,32 +235,43 @@ func (a *AuthImpl) updateTokenID(userID primitive.ObjectID, sessionID, tokenID s
 }
 
 func (a *AuthImpl) SocialAuth(socialUser goth.User) (*schema.SocialAuthResponse, error) {
-	var dbuser model.User
-	err := a.DB.Collection(model.UserColl).FindOne(context.TODO(), bson.M{"email": socialUser.Email}).Decode(&dbuser)
-	if err != nil {
-		err := errors.Wrap(err, "Failed to get user", &errors.DBError)
-		return nil, err
-	}
-
 	now := time.Now().UTC()
-
-	claims := &auth.UserClaim{ID: *dbuser.ID}
-	token_id := uuid.NewV4().String()
-	accessToken, refreshToken := a.signSocialToken(claims, token_id)
+	created := false
 
 	user := &model.User{
-		Name:        socialUser.Name,
-		Email:       strings.ToLower(socialUser.Email),
-		AccessToken: &socialUser.AccessToken,
-		ExpiresAt:   &socialUser.ExpiresAt,
-		IDToken:     &socialUser.IDToken,
+		Name:         socialUser.Name,
+		Email:        strings.ToLower(socialUser.Email),
+		AccessToken:  &socialUser.AccessToken,
+		RefreshToken: &socialUser.RefreshToken,
+		ExpiresAt:    &socialUser.ExpiresAt,
+		IDToken:      &socialUser.IDToken,
 	}
 
 	// Check if the user already exists
 	userEmailCount, _ := a.DB.Collection(model.UserColl).CountDocuments(context.TODO(), bson.M{"email": socialUser.Email})
-	if userEmailCount != 0 {
+	if userEmailCount == 0 {
+		// User does not exist
+		user.CreatedAt = &now
+		res, err := a.DB.Collection(model.UserColl).InsertOne(context.TODO(), user)
+		if err != nil {
+			err := errors.Wrap(err, "Failed to insert user", &errors.DBError)
+			return nil, err
+		}
+		userID := res.InsertedID.(primitive.ObjectID)
+		user.ID = &userID
+		created = true
+	}
+
+	if !created {
 		// Update user details in db
 		// Update token
+		var dbuser model.User
+		err := a.DB.Collection(model.UserColl).FindOne(context.TODO(), bson.M{"email": socialUser.Email}).Decode(&dbuser)
+		if err != nil {
+			err := errors.Wrap(err, "Failed to get user", &errors.DBError)
+			return nil, err
+		}
+		user.ID = dbuser.ID
 		user.UpdatedAt = &now
 		filter := bson.M{"email": strings.ToLower(socialUser.Email)}
 		update := bson.M{"$set": user}
@@ -269,32 +280,11 @@ func (a *AuthImpl) SocialAuth(socialUser goth.User) (*schema.SocialAuthResponse,
 		if err1 != nil {
 			return nil, errors.Wrap(err1, "Failed to update the user", &errors.DBError)
 		}
-
-		user.ID = dbuser.ID
-
-		resp := &schema.SocialAuthResponse{
-			User:         user,
-			AccessToken:  accessToken,
-			RefreshToken: refreshToken,
-		}
-
-		// Return user
-		return resp, nil
 	}
 
-	// Create User
-	user.CreatedAt = &now
-	user.RefreshToken = &socialUser.RefreshToken
-	res, err := a.DB.Collection(model.UserColl).InsertOne(context.TODO(), user)
-	if err != nil {
-		err := errors.Wrap(err, "Failed to insert user", &errors.DBError)
-		return nil, err
-	}
-	if res.InsertedID != nil {
-		userID := res.InsertedID.(primitive.ObjectID)
-		user.ID = &userID
-	}
-
+	claims := &auth.UserClaim{ID: *user.ID}
+	token_id := uuid.NewV4().String()
+	accessToken, refreshToken := a.signSocialToken(claims, token_id)
 	resp := &schema.SocialAuthResponse{
 		User:         user,
 		AccessToken:  accessToken,
