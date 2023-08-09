@@ -131,12 +131,12 @@ func TestTokenAuthentication_VerifyToken(t *testing.T) {
 			tAuth := &TokenAuthentication{
 				Config: tt.fields.Config,
 			}
-			got, _, err := tAuth.VerifyToken(tt.args.tokenString)
+			res, err := tAuth.VerifyToken(tt.args.tokenString)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TokenAuthentication.VerifyToken() error = %v, wantErr %v", err, tt.wantErr)
 				assert.Contains(t, tt.wantErrString, err.Error())
 			}
-			assert.Equal(t, tt.wantClaim, got)
+			assert.Equal(t, true, res)
 		})
 	}
 }
@@ -172,9 +172,9 @@ func TestTokenAuthentication_GetClaimWithTokenString(t *testing.T) {
 			tAuth := &TokenAuthentication{
 				Config: tt.fields.Config,
 			}
-			got, _, err := tAuth.VerifyToken(tt.args.tokenString)
+			res, err := tAuth.VerifyToken(tt.args.tokenString)
 			assert.Nil(t, err)
-			assert.Equal(t, tt.want, got)
+			assert.Equal(t, true, res)
 		})
 	}
 }

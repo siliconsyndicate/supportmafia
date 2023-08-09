@@ -1,6 +1,10 @@
 package schema
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"supportmafia/model"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 // ValidateLoginForm validates json data for user sign-in
 type ValidateLoginForm struct {
@@ -127,4 +131,10 @@ type UserModel struct {
 	UserID primitive.ObjectID `json:"user_id"`
 	Name   string             `json:"name"`
 	Email  string             `json:"email"`
+}
+
+type SocialAuthResponse struct {
+	User         *model.User `json:"user"`
+	AccessToken  string      `json:"access_token"`
+	RefreshToken string      `json:"refresh_token"`
 }

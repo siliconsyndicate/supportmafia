@@ -27,12 +27,11 @@ func (rh *Request) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	name := mux.CurrentRoute(r).GetName()
 	authToken := r.Header.Get("Authorization")
 	if authToken != "" && authToken != "open" {
-		claim, sessionID, err := rh.AuthFunc.VerifyToken(authToken)
+		claim, err := rh.AuthFunc.VerifyToken(authToken)
 		if err != nil {
 			requestCTX.SetErr(errors.Wrap(err, "Failed to verify token", &errors.PermissionDenied), http.StatusUnauthorized)
 			goto SKIP_REQUEST
 		} else {
-			requestCTX.SessionID = sessionID
 			requestCTX.UserClaim = claim.(*auth.UserClaim)
 		}
 	}

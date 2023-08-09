@@ -36,6 +36,10 @@ import (
 
 	"github.com/getsentry/sentry-go"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
+	"github.com/markbates/goth"
+	"github.com/markbates/goth/gothic"
+	"github.com/markbates/goth/providers/google"
 	"github.com/rs/cors"
 	"github.com/rs/zerolog"
 	"github.com/urfave/negroni"
@@ -113,6 +117,22 @@ func NewServer() *Server {
 // StartServer function initialize middlewares, router, loggers, and server config. It establishes connection with database & other services.
 // After setting up the server it runs the server on specified address and port.
 func (s *Server) StartServer() {
+
+	// Goth
+	key := "secret_key"  // Replace with your SESSION_SECRET or similar
+	maxAge := 86400 * 30 // 30 days
+	isProd := false      // Set to true when serving over https
+
+	store := sessions.NewCookieStore([]byte(key))
+	store.MaxAge(maxAge)
+	store.Options.Path = "/"
+	store.Options.HttpOnly = true // HttpOnly should always be enabled
+	store.Options.Secure = isProd
+
+	gothic.Store = store
+	goth.UseProviders(
+		google.New(s.API.Config.GoogleOAuth.ClientID, s.API.Config.GoogleOAuth.ClientSecret, s.API.Config.Goth.Url+"/auth/google/callback", "email", "profile"),
+	)
 	n := negroni.New()
 	c := cors.New(cors.Options{
 		AllowedOrigins:   s.Config.CORSConfig.AllowedOrigins,

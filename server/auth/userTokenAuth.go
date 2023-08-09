@@ -122,31 +122,20 @@ func (t *TokenAuthentication) SignToken(claim Claim) (string, error) {
 }
 
 // VerifyToken first verifies the authenticity of the jwt token string and then parse the token string into struct
-func (t *TokenAuthentication) VerifyToken(tokenString string) (Claim, string, error) {
+func (t *TokenAuthentication) VerifyToken(tokenString string) (Claim, error) {
 	uc := UserClaim{}
 	token, err := jwt.ParseWithClaims(tokenString, &uc, func(token *jwt.Token) (interface{}, error) {
 		return []byte(t.Config.JWTSignKey), nil
 	})
 	if err != nil {
-		return nil, "", errors.Wrap(err, "Invalid token, failed to parse token", &errors.PermissionDenied)
+		return nil, errors.Wrap(err, "Invalid token, failed to parse token", &errors.PermissionDenied)
 	}
 
 	if !token.Valid {
-		return nil, "", errors.Wrap(err, "Invalid token", &errors.PermissionDenied)
-	}
-	// Get session data from redis using session_id
-	var session_data *UserClaim
-	session_data_str, err := t.Session.GetToken(uc.SessionID)
-	if err != nil {
-		return nil, "", errors.Wrap(err, "session not found", &errors.PermissionDenied)
+		return nil, errors.Wrap(err, "Invalid token", &errors.PermissionDenied)
 	}
 
-	err = json.Unmarshal([]byte(session_data_str), &session_data)
-	if err != nil {
-		return nil, "", errors.Wrap(err, "cannot unmarshal session data", &errors.SomethingWentWrong)
-	}
-
-	return session_data, uc.SessionID, nil
+	return &uc, nil
 }
 
 // GetClaim returns token claim

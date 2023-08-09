@@ -33,15 +33,14 @@ type Config struct {
 	ESConfig         ESConfig         `mapstructure:"elasticsearch"`
 	Notification     Notification     `mapstructure:"notification"`
 	GoogleOAuth      GoogleOAuth      `mapstructure:"googleOAuth"`
-	FacebookOAuth    FacebookOAuth    `mapstructure:"fbAuth"`
+	Goth             Goth             `mapstructure:"goth"`
+}
+
+type Goth struct {
+	Url string `mapstructure:"url"`
 }
 
 type GoogleOAuth struct {
-	ClientID     string `mapstructure:"clientId"`
-	ClientSecret string `mapstructure:"clientSecret"`
-}
-
-type FacebookOAuth struct {
 	ClientID     string `mapstructure:"clientId"`
 	ClientSecret string `mapstructure:"clientSecret"`
 }
@@ -109,7 +108,7 @@ type APIConfig struct {
 	ShopifyConfig      ShopifyConfig
 	Notification       Notification
 	GoogleOAuth        GoogleOAuth
-	FacebookOAuth      FacebookOAuth
+	Goth               Goth
 	Mode               string `mapstructure:"mode"`
 	EnableTestRoute    bool   `mapstructure:"enableTestRoute"`
 	EnableMediaRoute   bool   `mapstructure:"enableMediaRoute"`
@@ -342,7 +341,7 @@ func GetConfigFromFile(fileName string) *Config {
 	config.APIConfig.AWSConfig = config.AWSConfig
 	config.APIConfig.Notification = config.Notification
 	config.APIConfig.GoogleOAuth = config.GoogleOAuth
-	config.APIConfig.FacebookOAuth = config.FacebookOAuth
+	config.APIConfig.Goth = config.Goth
 	return config
 }
 
