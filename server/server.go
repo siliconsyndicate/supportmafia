@@ -131,7 +131,7 @@ func (s *Server) StartServer() {
 
 	gothic.Store = store
 	goth.UseProviders(
-		google.New(s.API.Config.GoogleOAuth.ClientID, s.API.Config.GoogleOAuth.ClientSecret, "https://48a4-114-143-3-90.ngrok-free.app/auth/google/callback", "email", "profile"),
+		google.New(s.API.Config.GoogleOAuth.ClientID, s.API.Config.GoogleOAuth.ClientSecret, s.API.Config.Goth.Url+"/auth/google/callback", "email", "profile"),
 	)
 	n := negroni.New()
 	c := cors.New(cors.Options{
